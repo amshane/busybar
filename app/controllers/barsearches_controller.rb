@@ -3,6 +3,7 @@ class BarsearchesController < ApplicationController
   end
 
   def results
+    @location = Location.find_by(near: params['Location']['bar'])
     @results = all(@foursquare)
     @bars = Bar.create_from_array(@results)
   end
@@ -10,7 +11,8 @@ class BarsearchesController < ApplicationController
   private
 
     def find_bars(client)
-      client.search_venues(:near => "Lower East Side",radius: 3000, :intent => 'browse', :query=> 'pub', :categoryID => '4bf58dd8d48988d11b941735')['venues']
+      ##alphabet city, midtown west, doesn't work
+      client.search_venues(:near => (@location.near + ', New York, NY'),radius: 2000, :intent => 'browse', :query=> 'pub', :categoryID => '4bf58dd8d48988d11b941735')['venues']
     end
   
     def format_bars(bars)
@@ -33,6 +35,10 @@ class BarsearchesController < ApplicationController
       parse = parse_bars(format)
       sort = sort_bars(parse)
     end
+
+    # def location_picker
+    #   @location_picker = ["Financial District", "Tribeca", "SoHo", "Chinatown", "Little Italy", "Lower East Side", "Greenwich Village", "West Village", "East Village", "Chelsea", "Alphabet City", "Stuyvesant Town", "Kips Bay", "Murray Hill", "Midtown East", "Midtown West", "Upper East Side", "Hell's Kitchen", "Upper West Side", "Lincoln Square"].sort_by{|word| word}
+    # end
 
     helper_method :create_client
 end
